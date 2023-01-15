@@ -18,6 +18,7 @@ let state = -1;
 
 let btnRunStop; // Stop or Run the drawing from user or fourier
 let colorPicker;
+let fourierCheckbox;
 
 function mousePressed() {
   if(mouseY>windowHeight*CANVAS_WINDOW){
@@ -44,10 +45,12 @@ function setup() {
   fill(255);
   textAlign(CENTER);
   textSize(64);
-  text("Draw Something!", width/2, height/2);
+  text("Start drawing", width/2, height/2);
   btnRunStop = createButton('Stop')
+  btnRunStop.class('bn62')
   btnRunStop.mousePressed(runOrStop)
   colorPicker = createColorPicker('#FFFFFF'); //White as default
+  fourierCheckbox = createCheckbox('See fourier', true);
 }
 const runOrStop = _ => {
   if(btnRunStop.elt.textContent === 'Stop'){
@@ -68,12 +71,13 @@ function epicycles(x, y, rotation, dft) {
     let phase = dft[i].phase;
     x += radius * cos(freq * time + phase + rotation);
     y += radius * sin(freq * time + phase + rotation);
-
-    stroke(255, 100);
-    noFill();
-    ellipse(prevx, prevy, radius * 2);
-    stroke(255);
-    line(prevx, prevy, x, y);
+    if(fourierCheckbox.checked()){
+      stroke(255, 100);
+      noFill();
+      ellipse(prevx, prevy, radius * 2);
+      stroke(255);
+      line(prevx, prevy, x, y);
+    }
   }
   return createVector(x, y);
 }
