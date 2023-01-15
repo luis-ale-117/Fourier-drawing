@@ -24,7 +24,7 @@ class Complex {
   }
 }
 
-function dft(x) {
+function discretFourierTransform(x) {
   const X = [];
   const N = x.length;
   for (let k = 0; k < N; k++) {

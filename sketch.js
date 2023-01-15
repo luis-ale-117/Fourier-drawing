@@ -10,40 +10,14 @@ const USER = 0;
 const FOURIER = 1;
 const CANVAS_WINDOW = 3/4
 
-let x = [];
-let fourierX;
+let drownPath = [];
+let dft;
 let time = 0;
-let path = [];
-let drawing = [];
+let fourierPath = [];
 let state = -1;
 
 let btnRunStop; // Stop or Run the drawing from user or fourier
 let btnDrawing; 
-
-// function mousePressed() {
-//   if(mouseY > windowHeight*CANVAS_WINDOW){
-//     return
-//   }
-//   state = USER;
-//   drawing = [];
-//   x = [];
-//   time = 0;
-//   path = [];
-// }
-
-// function mouseReleased() {
-//   if(mouseY > windowHeight*CANVAS_WINDOW){
-//     return
-//   }
-//   state = FOURIER;
-//   const skip = 1;
-//   for (let i = 0; i < drawing.length; i += skip) {
-//     x.push(new Complex(drawing[i].x, drawing[i].y));
-//   }
-//   fourierX = dft(x);
-
-//   fourierX.sort((a, b) => b.amp - a.amp);
-// }
 
 function setup() {
   createCanvas(windowWidth, windowHeight*3/4);
@@ -76,29 +50,25 @@ const drawOrRun = _ => {
     btnDrawing.elt.textContent = 'Running!'
     state = FOURIER;
     const skip = 1;
-    for (let i = 0; i < drawing.length; i += skip) {
-      x.push(new Complex(drawing[i].x, drawing[i].y));
-    }
-    fourierX = dft(x);
+    dft = discretFourierTransform(drownPath);
 
-    fourierX.sort((a, b) => b.amp - a.amp);
+    dft.sort((a, b) => b.amp - a.amp);
   }else if(btnDrawing.elt.textContent === 'Running!'){
     btnDrawing.elt.textContent = 'Drawing!'
     state = USER;
-    drawing = [];
-    x = [];
+    drownPath = [];
     time = 0;
-    path = [];
+    fourierPath = [];
   }
 }
 
-function epicycles(x, y, rotation, fourier) {
-  for (let i = 0; i < fourier.length; i++) {
+function epicycles(x, y, rotation, dft) {
+  for (let i = 0; i < dft.length; i++) {
     let prevx = x;
     let prevy = y;
-    let freq = fourier[i].freq;
-    let radius = fourier[i].amp;
-    let phase = fourier[i].phase;
+    let freq = dft[i].freq;
+    let radius = dft[i].amp;
+    let phase = dft[i].phase;
     x += radius * cos(freq * time + phase + rotation);
     y += radius * sin(freq * time + phase + rotation);
 
@@ -117,34 +87,34 @@ function draw() {
     background(0);
     let point = createVector(mouseX - width / 2, mouseY - height / 2);
     if(mouseIsPressed && mouseY<=windowHeight*CANVAS_WINDOW){
-      drawing.push(point);
+      drownPath.push(new Complex(point.x,point.y));
     }
     stroke(255);
     noFill();
     beginShape();
-    for (let v of drawing) {
-      vertex(v.x + width / 2, v.y + height / 2);
+    for (let comp of drownPath) {
+      vertex(comp.re + width / 2, comp.im + height / 2);
     }
     endShape();
   } else if (state == FOURIER) {
     background(0);
-    let v = epicycles(width / 2, height / 2, 0, fourierX);
-    path.unshift(v);
+    let v = epicycles(width / 2, height / 2, 0, dft);
+    fourierPath.push(v);
     beginShape();
     noFill();
     strokeWeight(2);
     stroke(255, 0, 255);
-    for (let i = 0; i < path.length; i++) {
-      vertex(path[i].x, path[i].y);
+    for (let i = fourierPath.length-1; i>=0; i--) {
+      vertex(fourierPath[i].x, fourierPath[i].y);
     }
     endShape();
 
-    const dt = TWO_PI / fourierX.length;
+    const dt = TWO_PI / dft.length;
     time += dt;
 
     if (time > TWO_PI) {
       time = 0;
-      path = [];
+      fourierPath = [];
     }
   }
 
