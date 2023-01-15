@@ -17,32 +17,33 @@ let path = [];
 let drawing = [];
 let state = -1;
 
-let btnDrawing; // Stop or Run the drawing from user or fourier
+let btnRunStop; // Stop or Run the drawing from user or fourier
+let btnDrawing; 
 
-function mousePressed() {
-  if(mouseY > windowHeight*CANVAS_WINDOW){
-    return
-  }
-  state = USER;
-  drawing = [];
-  x = [];
-  time = 0;
-  path = [];
-}
+// function mousePressed() {
+//   if(mouseY > windowHeight*CANVAS_WINDOW){
+//     return
+//   }
+//   state = USER;
+//   drawing = [];
+//   x = [];
+//   time = 0;
+//   path = [];
+// }
 
-function mouseReleased() {
-  if(mouseY > windowHeight*CANVAS_WINDOW){
-    return
-  }
-  state = FOURIER;
-  const skip = 1;
-  for (let i = 0; i < drawing.length; i += skip) {
-    x.push(new Complex(drawing[i].x, drawing[i].y));
-  }
-  fourierX = dft(x);
+// function mouseReleased() {
+//   if(mouseY > windowHeight*CANVAS_WINDOW){
+//     return
+//   }
+//   state = FOURIER;
+//   const skip = 1;
+//   for (let i = 0; i < drawing.length; i += skip) {
+//     x.push(new Complex(drawing[i].x, drawing[i].y));
+//   }
+//   fourierX = dft(x);
 
-  fourierX.sort((a, b) => b.amp - a.amp);
-}
+//   fourierX.sort((a, b) => b.amp - a.amp);
+// }
 
 function setup() {
   createCanvas(windowWidth, windowHeight*3/4);
@@ -51,16 +52,43 @@ function setup() {
   textAlign(CENTER);
   textSize(64);
   text("Draw Something!", width/2, height/2);
-  btnDrawing = createButton('Stop')
-  btnDrawing.mousePressed(runOrStop)
+  btnRunStop = createButton('Stop')
+  btnRunStop.mousePressed(runOrStop)
+  btnDrawing = createButton('Running!')
+  btnDrawing.mousePressed(drawOrRun)
 }
 const runOrStop = _ => {
-  if(btnDrawing.elt.textContent === 'Stop'){
-    btnDrawing.elt.textContent = 'Run'
+  if(btnRunStop.elt.textContent === 'Stop'){
+    btnRunStop.elt.textContent = 'Run'
     noLoop()
-  }else if(btnDrawing.elt.textContent === 'Run'){
-    btnDrawing.elt.textContent = 'Stop'
+  }else if(btnRunStop.elt.textContent === 'Run'){
+    btnRunStop.elt.textContent = 'Stop'
     loop()
+  }
+}
+
+const drawOrRun = _ => {
+  // If stopped, do nothing
+  if(btnRunStop.elt.textContent === 'Run'){
+    return
+  }
+  if(btnDrawing.elt.textContent === 'Drawing!'){
+    btnDrawing.elt.textContent = 'Running!'
+    state = FOURIER;
+    const skip = 1;
+    for (let i = 0; i < drawing.length; i += skip) {
+      x.push(new Complex(drawing[i].x, drawing[i].y));
+    }
+    fourierX = dft(x);
+
+    fourierX.sort((a, b) => b.amp - a.amp);
+  }else if(btnDrawing.elt.textContent === 'Running!'){
+    btnDrawing.elt.textContent = 'Drawing!'
+    state = USER;
+    drawing = [];
+    x = [];
+    time = 0;
+    path = [];
   }
 }
 
@@ -86,9 +114,11 @@ function epicycles(x, y, rotation, fourier) {
 function draw() {
 
   if (state == USER) {
-  background(0);
+    background(0);
     let point = createVector(mouseX - width / 2, mouseY - height / 2);
-    drawing.push(point);
+    if(mouseIsPressed && mouseY<=windowHeight*CANVAS_WINDOW){
+      drawing.push(point);
+    }
     stroke(255);
     noFill();
     beginShape();
@@ -97,7 +127,7 @@ function draw() {
     }
     endShape();
   } else if (state == FOURIER) {
-  background(0);
+    background(0);
     let v = epicycles(width / 2, height / 2, 0, fourierX);
     path.unshift(v);
     beginShape();
