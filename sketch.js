@@ -17,6 +17,8 @@ let path = [];
 let drawing = [];
 let state = -1;
 
+let btnDrawing; // Stop or Run the drawing from user or fourier
+
 function mousePressed() {
   if(mouseY > windowHeight*CANVAS_WINDOW){
     return
@@ -49,6 +51,17 @@ function setup() {
   textAlign(CENTER);
   textSize(64);
   text("Draw Something!", width/2, height/2);
+  btnDrawing = createButton('Stop')
+  btnDrawing.mousePressed(runOrStop)
+}
+const runOrStop = _ => {
+  if(btnDrawing.elt.textContent === 'Stop'){
+    btnDrawing.elt.textContent = 'Run'
+    noLoop()
+  }else if(btnDrawing.elt.textContent === 'Run'){
+    btnDrawing.elt.textContent = 'Stop'
+    loop()
+  }
 }
 
 function epicycles(x, y, rotation, fourier) {
