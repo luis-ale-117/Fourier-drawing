@@ -19,6 +19,7 @@ let state = -1;
 let btnRunStop; // Stop or Run the drawing from user or fourier
 let colorPicker;
 let fourierCheckbox;
+let sliderThickness;
 
 function mousePressed() {
   if(mouseY>windowHeight*CANVAS_WINDOW){
@@ -50,6 +51,7 @@ function setup() {
   btnRunStop.class('bn62')
   btnRunStop.mousePressed(runOrStop)
   colorPicker = createColorPicker('#FFFFFF'); //White as default
+  sliderThickness = createSlider(1,7,1,1);
   fourierCheckbox = createCheckbox('See fourier', true);
 }
 const runOrStop = _ => {
@@ -73,6 +75,7 @@ function epicycles(x, y, rotation, dft) {
     y += radius * sin(freq * time + phase + rotation);
     if(fourierCheckbox.checked()){
       stroke(255, 100);
+      strokeWeight(1);
       noFill();
       ellipse(prevx, prevy, radius * 2);
       stroke(255);
@@ -91,6 +94,7 @@ function draw() {
       drownPath.push(new Complex(point.x,point.y));
     }
     stroke(colorPicker.color());
+    strokeWeight(sliderThickness.value());
     noFill();
     beginShape();
     for (let comp of drownPath) {
@@ -103,7 +107,7 @@ function draw() {
     fourierPath.push(v);
     beginShape();
     noFill();
-    strokeWeight(2);
+    strokeWeight(sliderThickness.value());
     stroke(colorPicker.color());
     for (let i = fourierPath.length-1; i>=0; i--) {
       vertex(fourierPath[i].x, fourierPath[i].y);
