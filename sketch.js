@@ -17,6 +17,7 @@ let fourierPath = [];
 let state = -1;
 
 let btnRunStop; // Stop or Run the drawing from user or fourier
+let colorPicker;
 
 function mousePressed() {
   if(mouseY>windowHeight*CANVAS_WINDOW){
@@ -46,6 +47,7 @@ function setup() {
   text("Draw Something!", width/2, height/2);
   btnRunStop = createButton('Stop')
   btnRunStop.mousePressed(runOrStop)
+  colorPicker = createColorPicker('#FFFFFF'); //White as default
 }
 const runOrStop = _ => {
   if(btnRunStop.elt.textContent === 'Stop'){
@@ -84,7 +86,7 @@ function draw() {
     if(mouseIsPressed && mouseY<=windowHeight*CANVAS_WINDOW){
       drownPath.push(new Complex(point.x,point.y));
     }
-    stroke(255);
+    stroke(colorPicker.color());
     noFill();
     beginShape();
     for (let comp of drownPath) {
@@ -98,7 +100,7 @@ function draw() {
     beginShape();
     noFill();
     strokeWeight(2);
-    stroke(255, 0, 255);
+    stroke(colorPicker.color());
     for (let i = fourierPath.length-1; i>=0; i--) {
       vertex(fourierPath[i].x, fourierPath[i].y);
     }
