@@ -17,7 +17,25 @@ let fourierPath = [];
 let state = -1;
 
 let btnRunStop; // Stop or Run the drawing from user or fourier
-let btnDrawing; 
+
+function mousePressed() {
+  if(mouseY>windowHeight*CANVAS_WINDOW){
+    return
+  }
+  state = USER;
+  drownPath = [];
+  time = 0;
+  fourierPath = [];
+}
+
+function mouseReleased() {
+  if(mouseY>windowHeight*CANVAS_WINDOW){
+    return
+  }
+  state = FOURIER;
+  dft = discretFourierTransform(drownPath);
+  dft.sort((a, b) => b.amp - a.amp);
+}
 
 function setup() {
   createCanvas(windowWidth, windowHeight*3/4);
@@ -28,8 +46,6 @@ function setup() {
   text("Draw Something!", width/2, height/2);
   btnRunStop = createButton('Stop')
   btnRunStop.mousePressed(runOrStop)
-  btnDrawing = createButton('Running!')
-  btnDrawing.mousePressed(drawOrRun)
 }
 const runOrStop = _ => {
   if(btnRunStop.elt.textContent === 'Stop'){
@@ -38,27 +54,6 @@ const runOrStop = _ => {
   }else if(btnRunStop.elt.textContent === 'Run'){
     btnRunStop.elt.textContent = 'Stop'
     loop()
-  }
-}
-
-const drawOrRun = _ => {
-  // If stopped, do nothing
-  if(btnRunStop.elt.textContent === 'Run'){
-    return
-  }
-  if(btnDrawing.elt.textContent === 'Drawing!'){
-    btnDrawing.elt.textContent = 'Running!'
-    state = FOURIER;
-    const skip = 1;
-    dft = discretFourierTransform(drownPath);
-
-    dft.sort((a, b) => b.amp - a.amp);
-  }else if(btnDrawing.elt.textContent === 'Running!'){
-    btnDrawing.elt.textContent = 'Drawing!'
-    state = USER;
-    drownPath = [];
-    time = 0;
-    fourierPath = [];
   }
 }
 
