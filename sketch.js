@@ -8,6 +8,7 @@
 
 const USER = 0;
 const FOURIER = 1;
+const CANVAS_WINDOW = 3/4
 
 let x = [];
 let fourierX;
@@ -17,6 +18,9 @@ let drawing = [];
 let state = -1;
 
 function mousePressed() {
+  if(mouseY > windowHeight*CANVAS_WINDOW){
+    return
+  }
   state = USER;
   drawing = [];
   x = [];
@@ -25,6 +29,9 @@ function mousePressed() {
 }
 
 function mouseReleased() {
+  if(mouseY > windowHeight*CANVAS_WINDOW){
+    return
+  }
   state = FOURIER;
   const skip = 1;
   for (let i = 0; i < drawing.length; i += skip) {
@@ -36,7 +43,7 @@ function mouseReleased() {
 }
 
 function setup() {
-  createCanvas(windowWidth, windowHeight);
+  createCanvas(windowWidth, windowHeight*3/4);
   background(0);
   fill(255);
   textAlign(CENTER);
